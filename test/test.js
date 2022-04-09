@@ -30,7 +30,7 @@ describe('Tiger contract: ',async()=>{
     describe('Test Name:',()=>{
         it("deploy : ", async ()=>{
             [owner, charity,Marketing,Dev,Prize,a1,a2,a2,a4,a5] = await ethers.getSigners();
-            const Thousandx = await ethers.getContractFactory('Rad');
+            const Thousandx = await ethers.getContractFactory('ShaolinNetworkPLMasterContract');
             thousandx = await Thousandx.deploy(owner.address, Marketing.address);
             await thousandx.deployed(); 
         })
@@ -77,8 +77,6 @@ describe('Tiger contract: ',async()=>{
             const bal6 = await thousandx.balanceOf(charity.address);
             console.log((BigNumber.from(bal6)).toString());
             
-        });
-        it("check Balance :", async()=>{
         });
     });
 });

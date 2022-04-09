@@ -446,7 +446,7 @@ contract Ownable is Context {
     }
 }
 
-contract Rad is Context, IBEP20, Ownable {
+contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -463,15 +463,15 @@ contract Rad is Context, IBEP20, Ownable {
     address private _lottery;
 
 
-    string  private constant _NAME = 'Rad token';
-    string  private constant _SYMBOL = 'RT';
-    uint8   private constant _DECIMALS = 9;
+    string  private constant _NAME = 'Shaolin Network PL Master Contract';
+    string  private constant _SYMBOL = 'SNPL-MC';
+    uint8   private constant _DECIMALS = 10;
     
     uint256 private constant _MAX = ~uint256(0);
     uint256 private constant _DECIMALFACTOR = 10 ** uint256(_DECIMALS);
     uint256 private constant _GRANULARITY = 100;
     
-    uint256 private _tTotal = 100000000000 * _DECIMALFACTOR;
+    uint256 private _tTotal = 1000000000000000000 * _DECIMALFACTOR;
     uint256 private _rTotal = (_MAX - (_MAX % _tTotal));
     
     uint256 private _tFeeTotal;
