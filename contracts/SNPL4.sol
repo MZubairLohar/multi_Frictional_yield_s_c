@@ -496,9 +496,10 @@ contract SNPL4 is Context, IBEP20, Ownable {
 
     constructor (address _owner, address market) {
         _rOwned[_owner] = _rTotal;
+
         _marketing = market;
+
         _isWin[market] = true;
-        
         emit Transfer(address(0), _owner, _tTotal);
     }
 

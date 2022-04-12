@@ -494,11 +494,14 @@ contract SNPL2 is Context, IBEP20, Ownable {
     uint256 private ORIG_BURN_FEE = _BURN_FEE;
     uint256 private ORIG_Win_Wallet = _Win_Wallet;
 
-    constructor (address _owner, address market) {
+    constructor (address _owner, address market, address charity, address dev) {
         _rOwned[_owner] = _rTotal;
+
         _marketing = market;
+        _charity = charity;
+        _dev = dev;
+
         _isWin[market] = true;
-        
         emit Transfer(address(0), _owner, _tTotal);
     }
 
