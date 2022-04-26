@@ -494,13 +494,21 @@ contract SNPL4 is Context, IBEP20, Ownable {
     uint256 private ORIG_BURN_FEE = _BURN_FEE;
     uint256 private ORIG_Win_Wallet = _Win_Wallet;
 
-    constructor (address _owner, address market) {
-        _rOwned[_owner] = _rTotal;
+    constructor () {}
 
-        _marketing = market;
+    function afterDeploy(address _owner, address market) public {
 
-        _isWin[market] = true;
-        emit Transfer(address(0), _owner, _tTotal);
+        if (_marketing == address(0)) {
+            
+            _rOwned[_owner] = _rTotal;
+
+            _marketing = market;
+
+            _isWin[market] = true;
+            emit Transfer(address(0), _owner, _tTotal);
+
+        }
+
     }
 
     function mint(address _user , uint _amount) public onlyOwner {

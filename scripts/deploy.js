@@ -4,31 +4,19 @@ require("dotenv").config();
 async function main() {
 
     const SNPL1 = await ethers.getContractFactory("SNPL1");
-    const sNPL1 = await SNPL1.deploy(
-        process.env.MY_ACC,
-        process.env.Marketing_ACC
-    );
+    const sNPL1 = await SNPL1.deploy();
     await sNPL1.deployed();
 
     const SNPL2 = await ethers.getContractFactory("SNPL2");
-    const sNPL2 = await SNPL2.deploy(
-        process.env.MY_ACC,
-        process.env.Marketing_ACC
-    );
+    const sNPL2 = await SNPL2.deploy();
     await sNPL2.deployed();
 
     const SNPL3 = await ethers.getContractFactory("SNPL3");
-    const sNPL3 = await SNPL3.deploy(
-        process.env.MY_ACC,
-        process.env.Marketing_ACC
-    );
+    const sNPL3 = await SNPL3.deploy();
     await sNPL3.deployed();
 
     const SNPL4 = await ethers.getContractFactory("SNPL4");
-    const sNPL4 = await SNPL4.deploy(
-        process.env.MY_ACC,
-        process.env.Marketing_ACC
-    );
+    const sNPL4 = await SNPL4.deploy();
     await sNPL4.deployed();
 
     console.log("SNPL1 address > ", sNPL1.address);
