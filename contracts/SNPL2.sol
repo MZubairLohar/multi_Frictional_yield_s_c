@@ -463,16 +463,16 @@ contract SNPL2 is Context, IBEP20, Ownable {
     // address private _lottery;
 
 
-    string  private constant _NAME = 'Shaolin Network PL Master Contract';
-    string  private constant _SYMBOL = 'SNPL-MC';
-    uint8   private constant _DECIMALS = 18;
+    string  private _NAME;
+    string  private _SYMBOL;
+    uint8   private _DECIMALS;
     
     uint256 private constant _MAX = ~uint256(0);
-    uint256 private constant _DECIMALFACTOR = 10 ** uint256(_DECIMALS);
+    uint256 private _DECIMALFACTOR;
     uint256 private constant _GRANULARITY = 100;
     
-    uint256 private _tTotal = 1000000000000000000 * _DECIMALFACTOR;
-    uint256 private _rTotal = (_MAX - (_MAX % _tTotal));
+    uint256 private _tTotal;
+    uint256 private _rTotal;
     
     uint256 private _tFeeTotal;
     uint256 private _tBurnTotal;
@@ -481,35 +481,37 @@ contract SNPL2 is Context, IBEP20, Ownable {
     uint256 private     _TAX_FEE = 100; // 1% BACK TO HOLDERS
     uint256 private    _BURN_FEE = 100; // 1% BURNED
     uint256 private  _Win_Wallet = 300; // 4% TO CHARITY WALLET & all the rest of the wallets
-    // uint256 private constant _MAX_TX_SIZE = 3333333330 * _DECIMALFACTOR;
-    // 1% Reflections (not for fundraisers) ✅
-    // 1% Burn
-    // 1% Charitable Causes
     
-    // 1% Marketing Wallet
-    // 1% Dev Team Cost Wallet
-    // 1% Prize Lottery
-    // Track original fees to bypass fees for charity account
     uint256 private ORIG_TAX_FEE = _TAX_FEE;
     uint256 private ORIG_BURN_FEE = _BURN_FEE;
     uint256 private ORIG_Win_Wallet = _Win_Wallet;
 
-    constructor () {}
+    constructor (
 
-    function afterDeploy(address _owner, address market, address charity, address dev) public {
+        string memory __NAME, 
+        string memory __SYMBOL, 
+        uint8 __DECIMALS, 
+        uint __supply, 
+        address __owner, 
+        address __charity, 
+        address __dev, 
+        address __market ) {
 
-        if (_marketing == address(0) && _charity == address(0) && _dev == address(0)) {
-            
-            _rOwned[_owner] = _rTotal;
+        _NAME = __NAME;
+        _SYMBOL = __SYMBOL;
+        _DECIMALS = __DECIMALS;
+        _DECIMALFACTOR = 10 ** uint256(__DECIMALS);
+        _tTotal = __supply * _DECIMALFACTOR;
+        _rTotal = (_MAX - (_MAX % _tTotal));
 
-            _marketing = market;
-            _charity = charity;
-            _dev = dev;
+        _rOwned[__owner] = _rTotal;
+        _charity = __charity;
+        _dev = __dev;
 
-            _isWin[market] = true;
-            emit Transfer(address(0), _owner, _tTotal);
+        _marketing = __market;
+        _isWin[__market] = true;
 
-        }
+        emit Transfer(address(0), __owner, _tTotal);
 
     }
 
@@ -518,15 +520,15 @@ contract SNPL2 is Context, IBEP20, Ownable {
         _tTotal += _amount;    
     }
 
-    function name() public pure returns (string memory) {
+    function name() public view returns (string memory) {
         return _NAME;
     }
 
-    function symbol() public pure returns (string memory) {
+    function symbol() public view returns (string memory) {
         return _SYMBOL;
     }
 
-    function decimals() public pure returns (uint8) {
+    function decimals() public view returns (uint8) {
         return _DECIMALS;
     }
 
@@ -639,18 +641,30 @@ contract SNPL2 is Context, IBEP20, Ownable {
     }
 
     function setWinWallet(address charity,address Dev) external onlyOwner() {
-        require(charity != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the charity account.');
-        require(Dev != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the Dev account.');
-        // require(Lottery != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 'The Uniswap router can not be the Lottery account.');
-        require(!_isWin[charity], "Account is already charity account");
-        require(!_isWin[Dev], "Account is already Dev account");
-        // require(!_isWin[Lottery], "Account is already Lottery account");
+
+        require (
+            charity != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 
+            'The Uniswap router can not be the charity account.'
+        );
+        require (
+            Dev != 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D, 
+            'The Uniswap router can not be the Dev account.'
+        );
+
+        require (
+            !_isWin[charity], 
+            "Account is already charity account"
+        );
+        require(
+            !_isWin[Dev], 
+            "Account is already Dev account"
+        );
+
         _isWin[charity] = true;
         _isWin[Dev] = true;
-        // _isWin[Lottery] = true;
         _charity = charity;
+
         _dev = Dev;
-        // _lottery = Lottery;
     }
 
     function _approve(address owner, address spender, uint256 amount) private {
@@ -825,19 +839,16 @@ contract SNPL2 is Context, IBEP20, Ownable {
         address currentWinWallet = _charity;
         address Market = _marketing;
         address Dev = _dev;
-        // address Prize = _lottery;
-        //1
+        
         _rOwned[Market] = _rOwned[Market].add(rCharity);
         _tOwned[Market] = _tOwned[Market].add(tWinWallet/3);
-        //2
+
         _rOwned[currentWinWallet] = _rOwned[currentWinWallet].add(rCharity);
         _tOwned[currentWinWallet] = _tOwned[currentWinWallet].add(tWinWallet/3);
-        //3
+
         _rOwned[Dev] = _rOwned[Dev].add(rCharity);
         _tOwned[Dev] = _tOwned[Dev].add(tWinWallet/3);
-        //4
-        // _rOwned[Prize] = _rOwned[Prize].add(rCharity);
-        // _tOwned[Prize] = _tOwned[Prize].add(tWinWallet/4);
+        
         emit Transfer(sender, currentWinWallet, tWinWallet);
     }
 
@@ -862,9 +873,5 @@ contract SNPL2 is Context, IBEP20, Ownable {
     function _getTaxFee() private view returns(uint256) {
         return _TAX_FEE;
     }
-
-    // function _getMaxTxAmount() private pure returns(uint256) {
-    //     return _MAX_TX_SIZE;
-    // }
     
 }
